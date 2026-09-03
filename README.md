@@ -1,6 +1,6 @@
 # FinTech 545 — Coursework
 
-Yangpu Han (`yangpuhan`)
+Puhan Yang (`yangpuhan`)
 
 Course repository: [dompazz/FinTech-545-Fall2026](https://github.com/dompazz/FinTech-545-Fall2026)
 
