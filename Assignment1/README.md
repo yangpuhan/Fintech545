@@ -13,7 +13,13 @@ Puhan Yang · FinTech 545, Quantitative Risk Management
 | `output/problemN.txt` | Saved console output of each script, so the numbers can be checked without re-running anything |
 | `figures/` | Generated figures, embedded in the PDF |
 | `problem1.csv` … `problem5.csv` | The data, copied from the class repository so this folder runs standalone |
-| `Assignment 1.pdf` | The problem statement, for reference |
+
+The problem statement is not duplicated here. It is
+`Assignments/Assignment1/Assignment 1.pdf` in the class repository,
+[dompazz/FinTech-545-Fall2026](https://github.com/dompazz/FinTech-545-Fall2026).
+The five CSVs are copied rather than referenced because the code reads them; a
+relative path out of this repository would not resolve for anyone who cloned
+only this one.
 
 ## Running the code
 
