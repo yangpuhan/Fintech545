@@ -25,20 +25,13 @@ format:
     toc-depth: 2
 ---
 
-# How to read this document
-
-Each problem below follows the three part structure the assignment asks for.
-**Predict** states what I expected from the data before fitting anything and
-why. **Fit** reports the models. **Reconcile** says whether the fit agreed with
-the prediction and, where it did not, what I had missed.
+# Conventions
 
 Every number quoted here is printed by the script named at the head of the
 section, and every figure is written by the same script. `README.md` gives the
-commands. The problem statement itself is not reproduced here; it is
-`Assignments/Assignment1/Assignment 1.pdf` in the class repository.
+commands.
 
-Two conventions are used throughout and are worth stating once, because
-packages disagree about both:
+Two conventions are used throughout, because packages disagree about both:
 
 * **Variance** uses the $n-1$ denominator. **Skewness and excess kurtosis** use
   the bias corrected estimators, and kurtosis is always reported in *excess*
@@ -49,10 +42,6 @@ packages disagree about both:
   distribution. A one regressor model with a normal error has $k = 3$; with a
   Student's $t$ error it has $k = 4$. `statsmodels` reports AIC only, so the
   correction term $\frac{2k^2 + 2k}{n - k - 1}$ is added by hand.
-
-The course convention of 255 trading days per year is recorded in `common.py`.
-No problem in this assignment asks for an annualized figure, so it is not
-applied to anything.
 
 \newpage
 
@@ -98,9 +87,9 @@ from Week 01 in turn, and naming the moment that does the rejecting:
 * **Lognormal --- rejected, by the third moment.** The lognormal has skewness
   $(e^{\sigma^2} + 2)\sqrt{e^{\sigma^2} - 1}$, which is *strictly positive* for
   every $\sigma > 0$. A negative sample skewness cannot be produced by any
-  member of the family. There is a second, independent reason to reject it, but
-  it is not a moment and I record it separately: the lognormal is supported on
-  $(0, \infty)$ and 406 of the 1000 observations are negative.
+  member of the family. A second reason, independent of any moment: the
+  lognormal is supported on $(0, \infty)$ and 406 of the 1000 observations are
+  negative.
 
 * **Student's $t$ --- rejected, by the third moment.** The $t$ is symmetric, so
   its skewness is 0 whenever it exists ($\nu > 3$). It handles the fourth
@@ -115,10 +104,8 @@ from Week 01 in turn, and naming the moment that does the rejecting:
   positive. It is the only one of the four that can carry both signs at once.
 
 So of the four families, only the NIG is admissible. By the shape table in
-Week 01 a skewed $t$ or a generalized hyperbolic would also survive; they are
-not among the four but they belong in the answer, because "the NIG is the only
-possibility" would be a stronger claim than the moments support. Two moments
-narrow the field; they do not pick a winner.
+Week 01 a skewed $t$ or a generalized hyperbolic would also survive. Two
+moments narrow the field; they do not pick a winner.
 
 ## Fit and reconcile
 
@@ -735,8 +722,7 @@ $-0.0381$, $-0.0632$, none of them outside $\pm 0.0877$. That is a cut-off.
 The ACF does not cut off. It starts at $+0.4616$, changes sign, and continues
 to produce non-zero values at lags 3 and 4 that are still outside the band
 before shrinking. A sign changing, shrinking sequence is a decay, not a
-cut-off. It is worth noticing that this is *oscillating* decay rather than the
-geometric $\rho(k) = \beta^k$ of an AR(1); that is a hint the AR polynomial has
+cut-off. The decay is *oscillating* rather than the geometric $\rho(k) = \beta^k$ of an AR(1); that is a hint the AR polynomial has
 complex roots, which the fit confirms below.
 
 **(b) The rule, and the band.**
@@ -763,8 +749,7 @@ the band again at lags 10 and 11 ($+0.1321$, $+0.0925$) and the PACF at lag 9
 ($+0.1264$). With twelve lags tested against a 5% band, some excursions are
 expected by chance, and these are isolated, at long lags, and small. I read
 them as noise and identify the model from the low order structure, but the
-picture is not perfectly clean and I would rather say so than present the first
-eight lags as though the rest did not exist.
+picture is not perfectly clean.
 
 ## Fit and reconcile
 

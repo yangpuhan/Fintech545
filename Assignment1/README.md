@@ -10,22 +10,13 @@ Puhan Yang · FinTech 545, Quantitative Risk Management
 | `answers.qmd` | Quarto source for that PDF |
 | `problem1.py` … `problem5.py` | One script per problem. Each prints every number quoted in the write-up and writes its figures. |
 | `common.py` | Shared code: the moment estimators, AICc, and the two MLE regressions used in Problem 2 |
-| `output/problemN.txt` | Saved console output of each script, so the numbers can be checked without re-running anything |
+| `output/problemN.txt` | Saved console output of each script, so the numbers can be checked without running anything |
 | `figures/` | Generated figures, embedded in the PDF |
-| `problem1.csv` … `problem5.csv` | The data, copied from the class repository so this folder runs standalone |
-
-The problem statement is not duplicated here. It is
-`Assignments/Assignment1/Assignment 1.pdf` in the class repository,
-[dompazz/FinTech-545-Fall2026](https://github.com/dompazz/FinTech-545-Fall2026).
-The five CSVs are copied rather than referenced because the code reads them; a
-relative path out of this repository would not resolve for anyone who cloned
-only this one.
+| `problem1.csv` … `problem5.csv` | The data |
 
 ## Running the code
 
-Python 3.9 or newer. Julia was not used because the packages needed here are
-all in the Python scientific stack and it was already installed; nothing in the
-assignment requires a particular language.
+Python 3.9 or newer.
 
 ```bash
 pip install -r requirements.txt
@@ -41,39 +32,34 @@ python3 problem4.py     # conditional mean and variance, band coverage, bivariat
 python3 problem5.py     # ACF/PACF, six AR and MA fits, AICc
 ```
 
-Each script is standalone, takes no arguments, reads its own CSV from the
-current directory, and prints a report to stdout. Nothing depends on anything
-else having been run first. To regenerate everything including the saved
-output:
+Each script takes no arguments, reads its own CSV from the current directory,
+and prints its report to stdout. Run them in any order. A few seconds each.
+
+To regenerate everything, including the saved output:
 
 ```bash
 mkdir -p output
 for i in 1 2 3 4 5; do python3 problem$i.py | tee output/problem$i.txt; done
 ```
 
-Runtime is a few seconds per script; Problem 4 is the slowest because it fits a
-bivariate *t* by Nelder–Mead.
-
 ## Rebuilding the PDF
 
-Needs Quarto and a TeX distribution with `lualatex`.
+Needs Quarto and a TeX distribution with `lualatex`. Run the five scripts
+first, so the figures exist.
 
 ```bash
 quarto render answers.qmd --to pdf
 ```
 
-That writes `Assignment1.pdf`. The figures must exist first, so run the five
-scripts before rendering a clean checkout.
-
 ## Where each number in the write-up comes from
 
-| Write-up section | Script | Console section to look for |
+| Write-up section | Script | Console section |
 |:--|:--|:--|
 | §2 moments, feasibility check | `problem1.py` | `PROBLEM 1 -- moments of the sample` |
 | §2 (b) 26 against 10, (c) both-tail table | `problem1.py` | `PROBLEM 1 -- normal fitted by matching…` |
 | §3 three fits, AICc, slopes | `problem2.py` | `PROBLEM 2 -- three models`, `-- AICc comparison`, `-- the three slope estimates` |
-| §3 (e) quantiles and the crossover | `problem2.py` | `PROBLEM 2 -- quantiles of the two fitted…` |
 | §3 (b) which assumption fails | `problem2.py` | `PROBLEM 2 -- residual diagnostics` |
+| §3 (e) quantiles and the crossover | `problem2.py` | `PROBLEM 2 -- quantiles of the two fitted…` |
 | §4 marginals, both matrices, gap ranking | `problem3.py` | `PROBLEM 3 -- marginal shape…`, `-- correlation matrices`, `-- every pair…` |
 | §4 (c) trimming table, normal scores | `problem3.py` | `PROBLEM 3 -- what produces the gap on x1-x2` |
 | §5 (a)–(c) blocks, factor, coefficient | `problem4.py` | `PROBLEM 4 (a)`, `(b)`, `(c)` |
@@ -83,22 +69,5 @@ scripts before rendering a clean checkout.
 | §6 (c)–(d) six AICc values, AR(2) roots | `problem5.py` | `PROBLEM 5 -- AR and MA fits`, `-- coefficients of AR(2)` |
 | §6 (e) third coefficient, R² comparison | `problem5.py` | `PROBLEM 5 (e) -- AR(2) against AR(3)` |
 
-## Two conventions, stated once
-
-These are the two places where packages disagree with each other, so both are
-pinned explicitly in `common.py` rather than left to a default:
-
-- **Moments.** Variance uses the *n−1* denominator. Skewness and excess
-  kurtosis use the bias-corrected estimators, and kurtosis is always reported
-  in **excess** form, so a normal sample returns 0 rather than 3. `scipy.stats`
-  defaults to the biased estimators, so `bias=False` is passed everywhere. Both
-  versions are printed by `problem1.py` so the difference can be seen.
-- **AICc.** `k = p + d`, following Week 02: *p* counts the regression
-  parameters including the intercept, *d* counts the parameters of the error
-  distribution. A one-regressor model with normal errors has k = 3, with
-  Student's *t* errors k = 4, an AR(*p*) has k = *p* + 2. `statsmodels` reports
-  AIC only, so the `(2k² + 2k)/(n − k − 1)` correction is added by hand in
-  `common.aicc`.
-
-The course convention of 255 trading days per year is recorded in `common.py`.
-No problem here asks for an annualized figure, so it is not applied to anything.
+The moment and AICc conventions the numbers use are stated in §1 of the
+write-up and implemented in `common.py`.
