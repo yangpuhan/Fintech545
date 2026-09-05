@@ -1,0 +1,103 @@
+
+==============================================================================
+PROBLEM 4 -- sample covariance matrix
+==============================================================================
+n = 1000
+means: x1 = -0.016714, x2 = +0.045288
+covariance (rows and columns ordered x1, x2):
+[[1.099875 1.696902]
+ [1.696902 4.104749]]
+correlation = 0.798623
+
+==============================================================================
+PROBLEM 4 (a) -- conditional variance of x2 given x1
+==============================================================================
+Sigma_bar = Sigma_11 - Sigma_12 Sigma_22^-1 Sigma_21
+          = var(x2) - cov(x1,x2)^2 / var(x1)
+          = 4.104749 - 1.696902^2 / 1.099875
+          = 1.486746
+conditional sd = 1.219322   (unconditional sd of x2 = 2.026018)
+
+factor by which the variance falls:
+  Sigma_bar / Sigma_11 = 1 - Sigma_12^2 / (Sigma_11 Sigma_22) = 1 - rho^2
+  = 1 - 0.798623^2 = 0.362201
+the sd falls by sqrt of that = 0.601832
+
+==============================================================================
+PROBLEM 4 (b) -- does that factor depend on the observed x1?
+==============================================================================
+Sigma_bar = Sigma_11 - Sigma_12 Sigma_22^-1 Sigma_21 contains no 'a'.
+Under the multivariate normal the conditional variance is therefore
+constant in the conditioning value.  The term that settles it is the
+absence of 'a': 'a' appears only in mu_bar, never in Sigma_bar.
+
+==============================================================================
+PROBLEM 4 (c) -- conditional mean of x2 given x1
+==============================================================================
+mu_bar = mu_1 + Sigma_12 Sigma_22^-1 (a - mu_2)
+       = mean(x2) + [cov(x1,x2)/var(x1)] (x1 - mean(x1))
+coefficient on x1: Sigma_12 Sigma_22^-1 = 1.696902 / 1.099875 = 1.542813
+implied intercept                       = 0.071073
+
+check against OLS of x2 on x1: slope 1.542813, intercept 0.071073
+difference in slope: 4.441e-16
+In regression terms the coefficient IS the OLS slope of x2 on x1:
+cov(x,y)/var(x) is the same object arriving from a different door.
+
+95% band: conditional mean +/- 1.96*1.219322 = +/- 2.389871
+The half width does not depend on x1, so the band has constant width.
+
+==============================================================================
+PROBLEM 4 (d) -- coverage of the band
+==============================================================================
+observations inside the band = 935 of 1000
+fraction                     = 0.9350
+nominal                      = 0.9500
+binomial se at the nominal level = 0.0069  -> shortfall is 2.18 se
+
+==============================================================================
+PROBLEM 4 (e) -- coverage by how far x1 sits from its mean
+==============================================================================
+                bucket      n   coverage       se   resid sd  resid ex.kurt
+           within 1 sd    759     0.9565   0.0074     1.0758          0.977
+    between 1 and 2 sd    190     0.8579   0.0253     1.5804          1.064
+           beyond 2 sd     51     0.9020   0.0416     1.5957          0.334
+
+pooled conditional sd assumed by the band = 1.2193
+
+==============================================================================
+PROBLEM 4 (f) -- diagnostics on the residual
+==============================================================================
+residual skewness        = +0.1198
+residual excess kurtosis = +1.5130
+Jarque-Bera              = 96.06, p = 1.380e-21
+
+marginal x1: skew -0.261, excess kurtosis +3.872
+marginal x2: skew +0.104, excess kurtosis +1.521
+
+A joint normal has normal margins.  These do not, and the residual
+spread grows with |x1|, which a joint normal forbids.
+
+==============================================================================
+PROBLEM 4 (f) -- a bivariate t fitted to the pair
+==============================================================================
+fitted degrees of freedom nu = 4.490
+fitted scale matrix:
+[[0.607215 0.970046]
+ [0.970046 2.442253]]
+implied covariance = nu/(nu-2) * scale:
+[[1.094994 1.74929 ]
+ [1.74929  4.404128]]
+sample covariance, for comparison:
+[[1.099875 1.696902]
+ [1.696902 4.104749]]
+implied correlation 0.796574  against sample 0.798623
+
+conditional sd multiplier sqrt((nu + d1)/(nu + 1)) at the fitted nu,
+against the residual sd actually observed in each bucket:
+                bucket  typical |z|  predicted sd  observed sd
+           within 1 sd          0.5        1.1330       1.0758
+    between 1 and 2 sd          1.4        1.3216       1.5804
+           beyond 2 sd          2.5        1.7055       1.5957
+
+wrote figures/problem4.png

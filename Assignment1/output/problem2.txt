@@ -1,0 +1,72 @@
+
+==============================================================================
+PROBLEM 2 -- three models
+==============================================================================
+n = 200
+
+OLS
+  alpha = 1.5607  (se 0.0963)
+  beta  = 2.9908  (se 0.0966)
+  s (unbiased residual sd, divisor n-p) = 1.3514
+  sigma read as an MLE (divisor n)      = 1.3446
+  log likelihood = -343.0110   k = 3   AICc = 692.1445
+
+MLE, normal error
+  alpha = 1.5607
+  beta  = 2.9908
+  sigma = 1.3446
+  log likelihood = -343.0110   k = 3   AICc = 692.1445
+
+MLE, Student's t error
+  alpha = 1.5480
+  beta  = 3.0192
+  sigma (SCALE, not sd) = 0.9355
+  nu                    = 3.6322
+  implied sd = sigma*sqrt(nu/(nu-2)) = 1.3956
+  log likelihood = -328.5612   k = 4   AICc = 665.3275
+
+==============================================================================
+PROBLEM 2 -- AICc comparison
+==============================================================================
+k = p + d, with p = 2 regression parameters (intercept and slope)
+and d the error-distribution parameters: 1 for the normal (sigma),
+2 for the t (sigma and nu).
+
+model                           loglik   k        AICc     dAICc
+OLS / normal MLE             -343.0110   3    692.1445   26.8170
+MLE, Student's t error       -328.5612   4    665.3275    0.0000
+
+AICc selects: MLE, Student's t error
+margin over the normal error model: 26.8170
+
+==============================================================================
+PROBLEM 2 -- the three slope estimates
+==============================================================================
+model                           beta   diff vs OLS   in OLS se
+OLS                           2.9908        0.0000       0.000
+MLE, normal error             2.9908        0.0000       0.000
+MLE, t error                  3.0192        0.0284       0.294
+
+==============================================================================
+PROBLEM 2 -- quantiles of the two fitted error distributions
+==============================================================================
+   level      normal           t     wider
+   0.950      2.2117      2.0538    normal
+   0.975      2.6354      2.7045         t
+   0.990      3.1281      3.7098         t
+   0.995      3.4635      4.6201         t
+
+the two quantile curves cross at about level 0.9703
+
+==============================================================================
+PROBLEM 2 -- residual diagnostics on the OLS fit
+==============================================================================
+residual skewness       = -0.3624
+residual excess kurtosis= +3.6168
+Jarque-Bera             = 106.23, p = 8.564e-24   (assumption 7, normality)
+Durbin-Watson           = 2.0159        (assumption 4, uncorrelated errors; 2 means none)
+Breusch-Pagan           = p 0.7798        (assumption 5, constant variance)
+
+Only the normality test rejects.  The violated assumption is 7.
+
+wrote figures/problem2.png

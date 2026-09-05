@@ -1,0 +1,7 @@
+# Assignment 1.  Versions are the ones the results were produced with; the code
+# uses nothing version-specific, so newer releases should work.
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+statsmodels>=0.14
+matplotlib>=3.7

@@ -1,0 +1,75 @@
+
+==============================================================================
+PROBLEM 5 -- ACF and PACF
+==============================================================================
+n = 500, mean = 0.6709, sd = 1.1211
+significance band = +/- 1.96/sqrt(n) = +/- 0.0877
+
+ lag       ACF   sig      PACF   sig
+   1   +0.4616   yes   +0.4616   yes
+   2   -0.0254         -0.3031   yes
+   3   -0.1657   yes   -0.0147      
+   4   -0.1104   yes   -0.0169      
+   5   -0.0841         -0.0843      
+   6   -0.0405         +0.0159      
+   7   -0.0193         -0.0381      
+   8   -0.0469         -0.0632      
+   9   +0.0446         +0.1264   yes
+  10   +0.1321   yes   +0.0435      
+  11   +0.0925   yes   -0.0153      
+  12   +0.0425         +0.0617      
+
+last lag outside the band: ACF 11, PACF 9
+
+==============================================================================
+PROBLEM 5 -- AR and MA fits
+==============================================================================
+k = p + d.  For AR(p): p AR coefficients + 1 intercept, plus d = 1
+for the fitted variance, so k = p + 2.  Same for MA(q): k = q + 2.
+statsmodels reports AIC only, so AICc is computed from the log
+likelihood by hand.
+
+   model      loglik   k         AIC        AICc
+   AR(1)   -706.2693   3   1418.5386   1418.5870
+   AR(2)   -682.1788   4   1372.3575   1372.4383
+   AR(3)   -682.1109   5   1374.2218   1374.3432
+   MA(1)   -691.5179   3   1389.0359   1389.0843
+   MA(2)   -686.5754   4   1381.1508   1381.2316
+   MA(3)   -681.9975   5   1373.9951   1374.1165
+
+AICc selects AR(2)
+   model        AICc   dAICc vs best
+   AR(1)   1418.5870         46.1486
+   AR(2)   1372.4383          0.0000
+   AR(3)   1374.3432          1.9049
+   MA(1)   1389.0843         16.6460
+   MA(2)   1381.2316          8.7933
+   MA(3)   1374.1165          1.6782
+
+==============================================================================
+PROBLEM 5 -- coefficients of AR(2)
+==============================================================================
+  const          +0.6706   se 0.0614   t  +10.92
+  ar.L1          +0.6012   se 0.0424   t  +14.16
+  ar.L2          -0.3026   se 0.0431   t   -7.02
+  sigma2         +0.8958   se 0.0581   t  +15.42
+
+characteristic equation z^2 - 0.6012 z - (-0.3026) = 0
+discriminant = phi1^2 + 4 phi2 = -0.8491  -> roots are complex
+roots: [0.3006+0.4607j 0.3006-0.4607j]
+modulus 0.5501 (inside the unit circle means stationary)
+A complex pair makes the ACF a damped oscillation, which is
+why the ACF changes sign at lag 2 instead of decaying monotonically.
+
+==============================================================================
+PROBLEM 5 (e) -- AR(2) against AR(3)
+==============================================================================
+AR(3) third coefficient  = -0.01654  se 0.04380  t -0.378
+log likelihood: AR(2) -682.1788, AR(3) -682.1109, gain 0.0679
+AICc:           AR(2) 1372.4383, AR(3) 1374.3432, penalty net of the gain +1.9049
+
+R^2: AR(2) 0.285730, AR(3) 0.285925, change +1.949e-04
+R^2 rose, as it must whenever a parameter is added, so it would
+never have rejected the larger model.
+
+wrote figures/problem5.png
