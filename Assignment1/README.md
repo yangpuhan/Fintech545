@@ -19,7 +19,7 @@ Puhan Yang · FinTech 545, Quantitative Risk Management
 Python 3.9 or newer.
 
 ```bash
-pip install -r requirements.txt
+pip install -r ../requirements.txt
 ```
 
 Then, from inside this directory:
