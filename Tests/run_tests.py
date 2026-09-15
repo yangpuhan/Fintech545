@@ -3,11 +3,9 @@
 
     python3 Tests/run_tests.py                  # all of them
     python3 Tests/run_tests.py 3.1 3.3          # just these
-    python3 Tests/run_tests.py --data <dir>     # point at the test data
+    python3 Tests/run_tests.py --data <dir>     # against another copy of the data
 
-The test data lives in the class repository and is not copied into this one.
-The directory is found, in order, from --data, then the FINTECH545_TESTFILES
-environment variable, then a sibling checkout of the class repo.
+The test data is in Tests/data, so a fresh clone runs with no setup.
 
 Tolerances.  Most cases are deterministic and are checked to 1e-8.  The
 exceptions are stated at the case that uses them:
@@ -45,23 +43,26 @@ def case(name, description, tol=1e-8, note=""):
 
 
 def find_data_dir(explicit=None):
+    """Locate the test CSVs.
+
+    The copies in Tests/data are the default, so a fresh clone of this
+    repository runs with no further setup.  --data and FINTECH545_TESTFILES
+    override it, which is how to re-check against the class repository if the
+    files there are updated.
+    """
+    here = Path(__file__).resolve().parent
     candidates = []
     if explicit:
         candidates.append(Path(explicit))
     if os.environ.get("FINTECH545_TESTFILES"):
         candidates.append(Path(os.environ["FINTECH545_TESTFILES"]))
-    here = Path(__file__).resolve().parent
-    candidates += [
-        here.parent.parent / "FinTech-545-Fall2026" / "testfiles" / "data",
-        here.parent.parent.parent / "FinTech-545-Fall2026" / "testfiles" / "data",
-    ]
+    candidates.append(here / "data")
+
     for c in candidates:
         if c.is_dir() and (c / "test1.csv").exists():
             return c
     raise SystemExit(
-        "Could not find the test data.  Pass --data <dir>, set "
-        "FINTECH545_TESTFILES, or check out the class repository\n"
-        "(dompazz/FinTech-545-Fall2026) next to this one.  Looked in:\n  "
+        "Could not find the test data.  Looked in:\n  "
         + "\n  ".join(str(c) for c in candidates))
 
 

@@ -15,6 +15,5 @@ pip install -r requirements.txt
 python3 Tests/run_tests.py
 ```
 
-The test data and the assignment problem statements live in the class
-repository and are not duplicated here; `Tests/run_tests.py` finds them next to
-this checkout, or takes `--data`.
+A fresh clone runs as is. The assignment problem statements are not duplicated
+here; they are in the class repository.

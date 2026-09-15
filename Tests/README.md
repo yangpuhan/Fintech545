@@ -9,16 +9,14 @@ python3 Tests/run_tests.py 3.1 3.3      # selected cases
 python3 Tests/run_tests.py -v 4.1       # print the matrices too
 ```
 
-Run from the repository root. Needs `numpy`, `pandas`, `scipy`.
+Run from the repository root. Needs `numpy`, `pandas`, `scipy`. Nothing else
+has to be checked out or configured.
 
 ## Test data
 
-Not copied into this repository. `run_tests.py` looks for it in this order:
-
-1. `--data <dir>`
-2. `$FINTECH545_TESTFILES`
-3. `../FinTech-545-Fall2026/testfiles/data`, a sibling checkout of
-   [dompazz/FinTech-545-Fall2026](https://github.com/dompazz/FinTech-545-Fall2026)
+`Tests/data` holds the 32 input and expected-output CSVs these cases use,
+copied from the class repository. To re-check against the originals instead,
+pass `--data <dir>` or set `$FINTECH545_TESTFILES`.
 
 ## Current status
 
