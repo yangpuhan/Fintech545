@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Functional tests 1.1 through 7.4, checked against the class expected output.
+"""Functional tests 1.1 through 7.6, checked against the class expected output.
 
     python3 Tests/run_tests.py                  # all of them
     python3 Tests/run_tests.py 3.1 3.3          # just these
@@ -14,6 +14,8 @@ exceptions are stated at the case that uses them:
              and the tolerance is set by 100,000 draws, not by the arithmetic.
   7.2 - 7.4  the class answers come from Ipopt and these from scipy, so the
              trailing digits of a numerical optimum need not agree.
+  7.6        scipy's own NIG optimizer, so the answer can move between scipy
+             versions.
 """
 
 import argparse
@@ -27,9 +29,10 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from riskmgmt import (aicc, chol_psd, ew_cov_var_corr, ew_covar, cov_to_corr,
-                      fit_general_t, fit_normal, fit_regression_t,
-                      higham_nearest_psd, missing_cov, near_psd,
-                      return_calculate, simulate_normal, simulate_pca)
+                      fit_general_t, fit_nig_mle, fit_nig_moments, fit_normal,
+                      fit_regression_t, higham_nearest_psd, missing_cov,
+                      near_psd, nig_params, return_calculate, simulate_normal,
+                      simulate_pca)
 
 CASES = {}
 
@@ -276,6 +279,23 @@ def t7_4():
     # coefficients here, so nothing is added to the count.
     got = np.array([aicc(fm.loglik(x), k=3, n=len(x))])
     return got, np.array([read("testout7_4.csv")["AICC"][0]])
+
+
+@case("7.5", "Fit a NIG by the method of moments")
+def t7_5():
+    x = read_matrix("test7_5.csv")[:, 0]
+    exp = read("testout7_5.csv")
+    return nig_params(fit_nig_moments(x)), np.array(
+        [exp["mu"][0], exp["alpha"][0], exp["beta"][0], exp["delta"][0]])
+
+
+@case("7.6", "Fit the same NIG by maximum likelihood", tol=1e-6,
+      note="scipy's own NIG optimizer; can move between scipy versions")
+def t7_6():
+    x = read_matrix("test7_5.csv")[:, 0]
+    exp = read("testout7_6.csv")
+    return nig_params(fit_nig_mle(x)), np.array(
+        [exp["mu"][0], exp["alpha"][0], exp["beta"][0], exp["delta"][0]])
 
 
 # ---------------------------------------------------------------------------

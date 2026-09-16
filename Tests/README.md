@@ -1,10 +1,10 @@
 # Functional tests
 
-Tests 1.1 through 7.4, implemented in [`../riskmgmt/`](../riskmgmt) and checked
+Tests 1.1 through 7.6, implemented in [`../riskmgmt/`](../riskmgmt) and checked
 against the expected output in the class repository.
 
 ```bash
-python3 Tests/run_tests.py              # all 23
+python3 Tests/run_tests.py              # all 25
 python3 Tests/run_tests.py 3.1 3.3      # selected cases
 python3 Tests/run_tests.py -v 4.1       # print the matrices too
 ```
@@ -14,7 +14,7 @@ has to be checked out or configured.
 
 ## Test data
 
-`Tests/data` holds the 32 input and expected-output CSVs these cases use,
+`Tests/data` holds the 35 input and expected-output CSVs these cases use,
 copied from the class repository. To re-check against the originals instead,
 pass `--data <dir>` or set `$FINTECH545_TESTFILES`.
 
@@ -44,13 +44,15 @@ pass `--data <dir>` or set `$FINTECH545_TESTFILES`.
   7.2  PASS  Fit a generalized t distribution                max rel err 4.71e-09
   7.3  PASS  Fit a t regression                              max rel err 2.32e-08
   7.4  PASS  AICc on the fitted t                            max rel err 6.11e-16
+  7.5  PASS  Fit a NIG by the method of moments               max rel err 1.02e-15
+  7.6  PASS  Fit the same NIG by maximum likelihood           max rel err 3.13e-14
 
-23 passed, 0 failed, 23 total
+25 passed, 0 failed, 25 total
 ```
 
 ## Tolerances
 
-Seventeen of the 23 match to machine precision. Three groups do not, and the
+Nineteen of the 25 match to machine precision. Three groups do not, and the
 runner prints the reason next to each:
 
 **5.1 – 5.5** are simulations. The expected-output files are one draw from
@@ -69,6 +71,11 @@ from scipy's Nelder–Mead, so they agree to eight or nine figures rather than t
 machine precision. Tolerances are `1e-5` on 7.2 and 7.4, `1e-4` on 7.3, which
 has six parameters.
 
+**7.6** calls `scipy.stats.norminvgauss.fit`, which is the same optimizer the
+expected output was generated from, so it agrees to `3e-14` here — but it is
+still an optimizer and a different scipy version could move the trailing
+digits, so the tolerance is `1e-6` rather than exact. Verified on scipy 1.17.1.
+
 ## Conventions worth pinning
 
 - `missing_cov` reads missing values as `NaN`. Skip-rows drops any row with a
@@ -83,3 +90,9 @@ has six parameters.
   deviation is `sigma * sqrt(nu/(nu-2))`.
 - AICc counts `k = 3` for a fitted generalized t, plus one per regression
   coefficient when there is a regression.
+- The NIG is reported as `(mu, alpha, beta, delta)`. scipy uses
+  `(a, b, loc, scale)` with `a = alpha*delta`, `b = beta*delta`, `loc = mu`,
+  `scale = delta`.
+- Test 7.5 uses a **mixed** set of moment estimators: the variance has the n-1
+  divisor while the skewness and excess kurtosis are the **biased** ones.
+  Matching that is what takes it from 1% off to 1e-15.
