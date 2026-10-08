@@ -41,9 +41,9 @@ pass `--data <dir>` or set `$FINTECH545_TESTFILES`.
   6.1  PASS  Arithmetic returns                              max rel err 1.00e-16
   6.2  PASS  Log returns                                     max rel err 9.99e-17
   7.1  PASS  Fit a normal distribution                       max rel err 2.78e-17
-  7.2  PASS  Fit a generalized t distribution                max rel err 4.71e-09
-  7.3  PASS  Fit a t regression                              max rel err 2.32e-08
-  7.4  PASS  AICc on the fitted t                            max rel err 6.11e-16
+  7.2  PASS  Fit a generalized t distribution                max rel err 5.16e-08
+  7.3  PASS  Fit a t regression                              max rel err 4.52e-08
+  7.4  PASS  AICc on the fitted t                            max rel err 4.07e-16
   7.5  PASS  Fit a NIG by the method of moments               max rel err 1.02e-15
   7.6  PASS  Fit the same NIG by maximum likelihood           max rel err 3.13e-14
 
@@ -67,7 +67,7 @@ their own inputs.
 either simulation draws from.
 
 **7.2 – 7.4** are numerical optima. The class answers come from Ipopt and these
-from scipy's Nelder–Mead, so they agree to eight or nine figures rather than to
+from scipy's Nelder–Mead, so they agree to seven or eight figures rather than to
 machine precision. Tolerances are `1e-5` on 7.2 and 7.4, `1e-4` on 7.3, which
 has six parameters.
 

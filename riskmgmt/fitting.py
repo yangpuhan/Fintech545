@@ -74,6 +74,19 @@ def _t_start(x):
     return float(np.mean(x)), sigma, nu
 
 
+def _initial_simplex(start, steps):
+    """Nelder-Mead starting simplex with an absolute step on every coordinate.
+
+    scipy's default steps each coordinate by 5% of its own starting value.  A
+    location started at the mean of de-meaned data is about 1e-19, so its step
+    is about 1e-20, the simplex has no width in that direction, and the
+    optimizer can never move the location off its start.  Steps set from the
+    data's scale do not have that failure.
+    """
+    start = np.asarray(start, dtype=float)
+    return np.vstack([start, start + np.diag(np.asarray(steps, dtype=float))])
+
+
 def fit_general_t(x):
     """Fit mu + sigma * T_nu by maximum likelihood over all three parameters.
 
@@ -89,10 +102,11 @@ def fit_general_t(x):
         return -np.sum(stats.t.logpdf(x, df=2.0 + np.exp(log_nu),
                                       loc=mu, scale=np.exp(log_sigma)))
 
+    start = [mu0, np.log(sigma0), np.log(max(nu0 - 2.0, 0.5))]
     res = optimize.minimize(
-        negative_loglik, [mu0, np.log(sigma0), np.log(max(nu0 - 2.0, 0.5))],
-        method="Nelder-Mead",
-        options={"xatol": 1e-12, "fatol": 1e-12, "maxiter": 100000, "maxfev": 100000},
+        negative_loglik, start, method="Nelder-Mead",
+        options={"xatol": 1e-12, "fatol": 1e-12, "maxiter": 100000, "maxfev": 100000,
+                 "initial_simplex": _initial_simplex(start, [0.1 * sigma0, 0.1, 0.1])},
     )
     mu, log_sigma, log_nu = res.x
     sigma, nu = float(np.exp(log_sigma)), float(2.0 + np.exp(log_nu))
@@ -131,10 +145,16 @@ def fit_regression_t(y, x):
                                       loc=0.0, scale=np.exp(log_sigma)))
 
     start = np.concatenate([[np.log(sigma0), np.log(max(nu0 - 2.0, 0.5))], beta0])
+    # Same absolute steps as fit_general_t.  A slope's step is the residual
+    # scale divided by its regressor's spread, so each step moves the fitted
+    # values by about a tenth of a residual.
+    beta_steps = 0.1 * sigma0 / np.concatenate([[1.0], np.std(x, axis=0)])
     res = optimize.minimize(
         negative_loglik, start, method="Nelder-Mead",
         options={"xatol": 1e-12, "fatol": 1e-12,
-                 "maxiter": 200000, "maxfev": 200000},
+                 "maxiter": 200000, "maxfev": 200000,
+                 "initial_simplex": _initial_simplex(
+                     start, np.concatenate([[0.1, 0.1], beta_steps]))},
     )
     # Nelder-Mead on six parameters benefits from a restart: the first simplex
     # collapses near the optimum and a second pass from there tightens it.
