@@ -1,0 +1,59 @@
+
+==============================================================================
+PROBLEM 5 (b) -- r_i = alpha_i + beta_i r_MKT + e_i
+==============================================================================
+n = 500 daily arithmetic returns
+
+           alpha      beta  resid sd (n-2)  resid sd (n-1)     R^2
+A       0.000205    1.0353        0.012901        0.012888  0.4181
+B       0.000315    0.9354        0.011550        0.011538  0.4226
+
+correlation of the residuals: 0.6983
+market sd 0.010553, mean 0.000764
+in-sample cov(MKT, e_A) = -5.82e-20, cov(MKT, e_B) = -4.64e-20  (zero by construction)
+raw correlation of A and B returns: 0.8251
+
+==============================================================================
+PROBLEM 5 (c) -- 100,000 simulated days, two residual assumptions
+==============================================================================
+full residual covariance:
+  simulated corr(e_A, e_B) = +0.6963
+  P1: VaR     50,298   ES     63,152
+  P2: VaR     15,841   ES     19,876
+residual off diagonal = 0:
+  simulated corr(e_A, e_B) = -0.0051
+  P1: VaR     44,450   ES     55,712
+  P2: VaR     28,472   ES     35,725
+
+==============================================================================
+PROBLEM 5 (d) -- delta normal VaR from the sample covariance of A, B
+==============================================================================
+P1: sd  30,649.91   VaR     50,415
+P2: sd   9,626.15   VaR     15,834
+
+==============================================================================
+PROBLEM 5 (e), (f) -- the same VaRs in closed form
+==============================================================================
+                                      P1          P2
+full residual covariance          50,415      15,834
+residual off diagonal = 0         44,494      28,507
+delta normal, sample cov          50,415      15,834
+
+simulated (from (c)):
+full residual covariance          50,298      15,841
+residual off diagonal = 0         44,450      28,472
+
+max |model implied cov - sample cov| = 1.63e-19  (sample cov entries ~ 2.3e-04)
+
+shortcut against the full model, simulated VaR:
+  P1: 44,450 vs 50,298  (-11.6%)
+  P2: 28,472 vs 15,841  (+79.7%)
+
+variance decomposition, $^2 per day:
+              market     resid var     resid cov         total  cov share
+P1       432,481,449   299,243,934  +207,691,734   939,417,117     +22.1%
+P2         1,110,499   299,243,934  -207,691,734    92,662,700    -224.1%
+
+net market beta: P1 1.9707, P2 0.0999
+
+wrote figures/problem5.png

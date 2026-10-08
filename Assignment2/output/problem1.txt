@@ -1,0 +1,134 @@
+
+==============================================================================
+PROBLEM 1 -- days each pair is jointly observed
+==============================================================================
+              A        B        C        D      IDX
+A           242      242      221       93      242
+B           242      242      221       93      242
+C           221      221      228       83      228
+D            93       93       83       96       96
+IDX         242      242      228       96      250
+
+days all five trade: 81 of 250
+D's first traded day: 151   (so every complete row is from day 151 on)
+C missing on 22 days, A and B on 8
+
+rough standard error of each correlation, 1/sqrt(n):
+              A        B        C        D      IDX
+A         0.064    0.064    0.067    0.104    0.064
+B         0.064    0.064    0.067    0.104    0.064
+C         0.067    0.067    0.066    0.110    0.066
+D         0.104    0.104    0.110    0.102    0.102
+IDX       0.064    0.064    0.066    0.102    0.063
+
+==============================================================================
+PROBLEM 1 (b) -- how small the smallest eigenvalue is
+==============================================================================
+variance of IDX - basket on the 81 complete rows = 3.2221e-07   (sd 0.000568 per day)
+||w * sd||^2 on the same rows = 2.1129e-04
+smallest eigenvalue <= 3.2221e-07 / 2.1129e-04 = 0.001525
+
+==============================================================================
+PROBLEM 1 (d) -- complete case and pairwise correlation
+==============================================================================
+complete case (rows where all five trade)
+              A        B        C        D      IDX
+A        1.0000   0.3967   0.2466   0.4136   0.8714
+B        0.3967   1.0000   0.3169   0.2361   0.6709
+C        0.2466   0.3169   1.0000   0.1852   0.5648
+D        0.4136   0.2361   0.1852   1.0000   0.5719
+IDX      0.8714   0.6709   0.5648   0.5719   1.0000
+
+eigenvalues: [1.505787e-03 5.483453e-01 6.933196e-01 8.704410e-01 2.886388e+00]
+
+pairwise (each entry from the rows where that pair trades)
+              A        B        C        D      IDX
+A        1.0000   0.4686   0.4309   0.4384   0.8696
+B        0.4686   1.0000   0.4630   0.2767   0.7329
+C        0.4309   0.4630   1.0000   0.1846   0.7136
+D        0.4384   0.2767   0.1846   1.0000   0.6057
+IDX      0.8696   0.7329   0.7136   0.6057   1.0000
+
+eigenvalues: [-0.011072  0.471422  0.528367  0.857381  3.153902]
+
+complete case: numpy Cholesky succeeds (matrix is positive definite)
+complete case: chol_psd succeeds, 5 non-zero columns, max |LL' - C| = 1.11e-16
+pairwise     : numpy Cholesky FAILS -- Matrix is not positive definite
+pairwise     : chol_psd FAILS -- matrix is not positive semi-definite: pivot 4 is -1.643e-02, past the -1e-08 tolerance for rounding error
+
+eigenvector of the negative eigenvalue : [-0.3943 -0.2336 -0.2669 -0.2086  0.8217]
+tracking portfolio in correlation units: [-0.4392 -0.2379 -0.2439 -0.1519  0.8173]
+cosine between them = 0.9971
+
+==============================================================================
+PROBLEM 1 (e) -- tracking portfolio variance, pairwise correlation
+==============================================================================
+full history standard deviations (each series on its own days):
+  A   0.016502   n = 242
+  B   0.011919   n = 242
+  C   0.018324   n = 228
+  D   0.022829   n = 96
+  IDX 0.012281   n = 250
+
+w' Sigma w = -1.7994e-06    <-- negative
+
+for reference, the variance of IDX - basket measured directly on the 81 complete rows = 3.2221e-07
+the complete case correlation with the same full history sds gives 1.0975e-06
+
+==============================================================================
+PROBLEM 1 (f) -- Rebonato-Jackel and Higham repairs
+==============================================================================
+                         min eig   ||. - pw||_F     w Sigma w
+Rebonato-Jackel       -7.515e-17       0.016182    6.8073e-07
+Higham                -9.912e-10       0.015520    6.7876e-07
+
+||RJ - Higham||_F = 0.004579
+Higham repair: numpy Cholesky FAILS -- Matrix is not positive definite
+Higham repair: chol_psd succeeds, 4 non-zero columns, max |LL' - C| = 1.46e-09
+
+==============================================================================
+PROBLEM 1 (h) -- entries the Higham repair moved, largest first
+==============================================================================
+pair        n days  pairwise    Higham    change  RJ change   v_i*v_j
+A-IDX          242    0.8696    0.8625   -0.0070    -0.0075   -0.3240
+C-IDX          228    0.7136    0.7088   -0.0048    -0.0054   -0.2193
+B-IDX          242    0.7329    0.7287   -0.0042    -0.0051   -0.1919
+D-IDX           96    0.6057    0.6020   -0.0037    -0.0043   -0.1714
+A-C            221    0.4309    0.4332   +0.0023    +0.0006   +0.1052
+A-B            242    0.4686    0.4706   +0.0020    +0.0005   +0.0921
+A-D             93    0.4384    0.4402   +0.0018    +0.0004   +0.0823
+B-C            221    0.4630    0.4644   +0.0014    +0.0004   +0.0623
+C-D             83    0.1846    0.1858   +0.0012    +0.0005   +0.0557
+B-D             93    0.2767    0.2777   +0.0011    +0.0004   +0.0487
+
+v_i*v_j is the product of the negative eigenvector's loadings.  A
+single clipped eigenvalue moves entry (i,j) by about -lambda*v_i*v_j,
+so the change is set by the eigenvector, not by the day counts.
+correlation between |change| and v_i*v_j over the 10 pairs: 1.0000
+correlation between |change| and 1/n days:                   -0.4806
+
+==============================================================================
+PROBLEM 1 (i) -- size of the repair against the estimator gap
+==============================================================================
+||complete case - pairwise||_F = 0.423935
+||Higham - pairwise||_F        = 0.015520
+ratio                          = 27.3
+
+largest entrywise gaps between the two estimators:
+  A-C      complete 0.2466  pairwise 0.4309  gap -0.1843
+  C-IDX    complete 0.5648  pairwise 0.7136  gap -0.1487
+  B-C      complete 0.3169  pairwise 0.4630  gap -0.1461
+  A-B      complete 0.3967  pairwise 0.4686  gap -0.0719
+  B-IDX    complete 0.6709  pairwise 0.7329  gap -0.0620
+
+==============================================================================
+PROBLEM 1 (i) -- A, B, C, IDX before and after day 151
+==============================================================================
+pair      days 1-150    n  days 151-250    n   z stat
+A-B            0.489  145         0.417   97     0.68
+A-C            0.532  136         0.270   85     2.25
+B-C            0.515  136         0.378   85     1.22
+A-IDX          0.879  145         0.854   97     0.75
+C-IDX          0.785  141         0.580   87     2.86
+
+wrote figures/problem1.png

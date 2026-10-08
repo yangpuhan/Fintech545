@@ -1,0 +1,155 @@
+
+==============================================================================
+PROBLEM 4 (a) -- first four moments
+==============================================================================
+                    n          mean            sd      skew  ex. kurt
+X1               1000      0.000257      0.011894   -0.0342   -0.1171
+X2               1000     -0.000252      0.016168   -0.6150    7.1250
+X3               1000      0.000890      0.010019    0.0741    2.8741
+
+the same with each series' single most extreme day removed:
+        extreme day     value  in sds      skew  ex. kurt
+X1              952   -0.0400   -3.38   -0.0055   -0.1876
+X2              952   -0.1429   -8.82    0.0559    1.7247
+X3              952   -0.0612   -6.20    0.3132    1.7307
+
+standard error of excess kurtosis under normality ~ sqrt(24/m) = 0.155; of skewness ~ sqrt(6/m) = 0.077
+
+all three extremes fall on the same day, day 952: ranks X1 1, X2 1, X3 1 of 1000
+
+==============================================================================
+PROBLEM 4 (b) -- joint tail days, ranks scaled into (0,1)
+==============================================================================
+expected joint days per pair under independence: 1000 x 0.025^2 = 0.625
+
+pair         tau  sin(pi tau/2)  worst 2.5%  best 2.5%  Gaussian at that rho
+X1-X2     0.3964         0.5833           6          8                  5.93
+X1-X3     0.3354         0.5029           7         12                  4.66
+X2-X3     0.3074         0.4644           6          9                  4.14
+total                                    19         29                 14.73
+
+observed / Gaussian joint exceedance, summed over the three pairs and both tails:
+  q = 0.25   observed   766   Gaussian    736.4   ratio 1.04
+  q = 0.1    observed   224   Gaussian    201.4   ratio 1.11
+  q = 0.05   observed    90   Gaussian     76.7   ratio 1.17
+  q = 0.025  observed    48   Gaussian     29.5   ratio 1.63
+
+==============================================================================
+PROBLEM 4 (c) -- normal against t for each margin, by AICc
+==============================================================================
+k = 2 for the normal (mu, sigma), 3 for the t (mu, sigma, nu)
+
+         ll normal        ll t  AICc normal      AICc t        nu  choice
+X1        3013.274    3013.274    -6022.536   -6020.524    > 1000  normal
+X2        2706.253    2762.104    -5408.494   -5518.185     5.271       t
+X3        3184.851    3217.020    -6365.691   -6428.016     6.095       t
+
+chosen margins:
+  X1: normal, mu 0.000257, sigma 0.011894
+  X2: t, mu -0.000176, sigma 0.012544, nu 5.2715
+  X3: t, mu 0.000746, sigma 0.008181, nu 6.0949
+
+X2's t refitted without day 952: nu 6.0445
+
+==============================================================================
+PROBLEM 4 (d) -- Gaussian and t copula, same U, same R
+==============================================================================
+R = sin(pi tau / 2), tau computed on U:
+  X1     1.0000   0.5833   0.5029
+  X2     0.5833   1.0000   0.4644
+  X3     0.5029   0.4644   1.0000
+smallest eigenvalue before any repair: 0.4128 (no repair needed)
+
+                          Gaussian           t
+log likelihood             350.454     451.999
+free parameters k                0           1
+nu hat                          --      3.6585
+AICc                      -700.907    -901.994
+BIC                       -700.907    -897.090
+
+delta BIC = 2(ll_t - ll_G) - ln m = 203.090 - 6.908 = 196.183
+delta AICc = 201.086
+
+profile of the t copula log likelihood:
+  nu =    3.0   ll =   449.224
+  nu =    3.5   ll =   451.877
+  nu =    4.0   ll =   451.554
+  nu =    5.0   ll =   447.419
+  nu =    6.0   ll =   441.975
+  nu =    8.0   ll =   431.561
+  nu =   12.0   ll =   415.960
+  nu =   20.0   ll =   397.922
+  nu =   50.0   ll =   374.235
+  nu =  100.0   ll =   363.556
+
+==============================================================================
+PROBLEM 4 (e) -- portfolio VaR and ES, $1,000,000 in each
+==============================================================================
+                        VaR 5%       ES 5%      VaR 1%       ES 1%
+Gaussian copula         49,477      66,218      75,971      93,561
+t copula                48,656      67,924      77,981     101,412
+historical              47,939      65,699      70,092     102,424
+  sim. se, Gauss           259         471         615       1,013
+  sim. se, t               256         428         477       1,108
+
+==============================================================================
+PROBLEM 4 (h) -- moving from the Gaussian to the t copula
+==============================================================================
+                        VaR 5%       ES 5%      VaR 1%       ES 1%
+t - Gaussian              -821      +1,706      +2,010      +7,851
+  in %                   -1.7%       +2.6%       +2.6%       +8.4%
+  se of diff               297         371         339       1,315
+  diff / se               -2.8         4.6         5.9         6.0
+
+portfolio sd: Gaussian 31,179   t 31,196   historical 31,328
+
+probability the simulated portfolio loses more than the Gaussian copula's VaR:
+  5% VaR (49,477): Gaussian 0.0500, t 0.0478
+  1% VaR (75,971): Gaussian 0.0100, t 0.0112
+0.1% quantile of the loss: Gaussian 114,661, t 131,572
+
+==============================================================================
+PROBLEM 4 (f) -- joint tail days per 1,000, implied by each copula
+==============================================================================
+pair      data lo  data hi  Gauss lo  Gauss hi    t lo    t hi
+X1-X2           6        8      5.70      5.52    9.02    9.07
+X1-X3           7       12      4.80      4.63    7.77    7.89
+X2-X3           6        9      4.18      3.97    7.18    7.01
+total          19       29     14.68     14.12   23.97   23.97
+
+both tails together: data 48, Gaussian 28.8, t 47.9
+  under the Gaussian P(count >= 48) = 0.0007,  P(count <= 48) = 0.9996
+  under the t        P(count >= 48) = 0.5157,  P(count <= 48) = 0.5417
+
+==============================================================================
+PROBLEM 4 (i) -- each day's contribution to ll_t - ll_Gauss
+==============================================================================
+total gain = 101.545
+
+series in outer 5%      days  sum of gain   share  mean per day
+0                        784       49.843   49.1%        0.0636
+1                        147      -19.016  -18.7%       -0.1294
+2                         54       44.439   43.8%        0.8229
+3                         15       26.279   25.9%        1.7519
+
+days with no series in its outer 5%: 784, contributing 49.843 of 101.545 (49.1%)
+days where the t scores higher: 579 of 1000
+the 20 days with the largest gain contribute 67.770
+day 952 alone contributes 2.604
+middle days split at the median distance from the centre (|z| = 1.20):
+  inner half: gain +48.155   outer half: gain +1.688
+
+==============================================================================
+PROBLEM 4 (j) -- tail dependence coefficient
+==============================================================================
+pair         rho  lambda, t copula  lambda, Gaussian
+X1-X2     0.5833            0.3220            0.0000
+X1-X3     0.5029            0.2733            0.0000
+X2-X3     0.4644            0.2525            0.0000
+
+(at nu = 3.6585)
+nu within 1.92 log likelihood units of the maximum: 3.10 to 4.43
+lambda for X1-X2 across that range: 0.2813 to 0.3565
+
+wrote figures/problem4_ranks.png
+wrote figures/problem4_fit.png

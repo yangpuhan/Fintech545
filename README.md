@@ -9,6 +9,7 @@ Course repository: [dompazz/FinTech-545-Fall2026](https://github.com/dompazz/Fin
 | [`riskmgmt/`](riskmgmt) | The library. One module per block of functional tests. |
 | [`Tests/`](Tests) | Functional tests 1.1 – 7.6 against the class expected output. All 25 pass. |
 | [`Assignment1/`](Assignment1) | Univariate and Multivariate Statistics |
+| [`Assignment2/`](Assignment2) | Covariance, VaR, and Copulas |
 
 ```bash
 pip install -r requirements.txt

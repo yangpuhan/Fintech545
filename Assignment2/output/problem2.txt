@@ -1,0 +1,75 @@
+
+==============================================================================
+PROBLEM 2 (b) -- effective sample size and half life
+==============================================================================
+n = 500 returns; sample mean removed = 0.000162
+recent days judged from the plot: 40
+
+  lambda     n_eff  (1+l)/(1-l)  half life   weight on last 40
+    0.97     65.67        65.67      22.76              0.7043
+    0.94     32.33        32.33      11.20              0.9158
+   equal       500                                      0.0800
+
+variance changepoint by maximum likelihood: after return 461, leaving 39 recent days
+  weight on the last 39 at lambda 0.97: 0.6951
+  weight on the last 39 at lambda 0.94: 0.9105
+
+==============================================================================
+PROBLEM 2 (c) -- first four moments, full sample
+==============================================================================
+mean -2.22e-19   sd 0.011912   skew -0.1561   excess kurtosis +2.1659
+Jarque-Bera 96.75, p = 9.81e-22
+standard error of excess kurtosis under normality ~ sqrt(24/n) = 0.2191, so 2.17 is 9.9 standard errors from 0
+
+==============================================================================
+PROBLEM 2 (d) -- five one day VaR estimates, $1,000,000 position
+==============================================================================
+method                         sd used       VaR ($)
+Student t (MLE)               0.011818        18,872
+Normal, equal weight          0.011912        19,594
+Historical simulation         0.011912        20,574
+Normal, EW lambda=0.97        0.020709        34,064
+Normal, EW lambda=0.94        0.022074        36,308
+
+(the t row shows its implied sd, sigma*sqrt(nu/(nu-2)); the historical row has no sd and shows the sample's)
+
+fitted t: mu = 0.000182, sigma (scale) = 0.010290, nu = 8.2699, log likelihood = 1516.6916
+  standardized 5% quantile: t -1.6123 vs normal -1.6449
+
+EW sd squared around zero instead of the weighted mean:
+  lambda 0.97: sd 0.021047, VaR 34,619
+  lambda 0.94: sd 0.023532, VaR 38,707
+
+==============================================================================
+PROBLEM 2 (e) -- what sets the historical 5% quantile
+==============================================================================
+the 5% quantile is the 25th worst of 500 days; of those 25, 10 are in the last 40
+
+==============================================================================
+PROBLEM 2 (f) -- standard deviation inside each regime
+==============================================================================
+first 460 days: sd 0.010178   excess kurtosis -0.2023
+last 40 days : sd 0.024289   excess kurtosis +0.0301
+ratio 2.386
+normal VaR at each regime's sd: calm 16,741, recent 39,952
+
+excess kurtosis of a 0.92/0.08 mixture of N(0,0.0102^2) and N(0,0.0243^2) = 2.5723
+mixture sd = 0.011937  (sample sd 0.011912)
+5% VaR of the mixture = 18,455; standard error of a 5% sample quantile from n = 500: 1,226
+historical VaR sits +1.73 standard errors from the mixture value
+
+fitted t's implied sd 0.011818 -- the full sample sd, not either regime's
+two regime model's EW sd at lambda 0.97: sqrt(0.296*s1^2 + 0.704*s2^2) = 0.021122
+two regime model's EW sd at lambda 0.94: sqrt(0.084*s1^2 + 0.916*s2^2) = 0.023431
+
+==============================================================================
+PROBLEM 2 (g) -- the gap between the two EW VaRs against its noise
+==============================================================================
+gap = 2,244
+lambda 0.97: se(sd)/sd = 1/sqrt(2 n_eff) = 0.0873, so se(VaR) ~ 2,972
+lambda 0.94: se(sd)/sd = 1/sqrt(2 n_eff) = 0.1244, so se(VaR) ~ 4,515
+0.97 is 6.2% below 0.94
+gap the two regime model predicts: 3,799
+lambda 0.94 squared around zero minus around the weighted mean: 2,399
+
+wrote figures/problem2.png
